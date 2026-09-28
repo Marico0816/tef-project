@@ -6,8 +6,15 @@ const FLAG_FACES = 1, FLAG_SCALAR = 2, FLAG_RGB = 4;
 export async function fetchTEFM(url, onProgress) {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`${url}: HTTP ${res.status}`);
-  const total = Number(res.headers.get('Content-Length')) || 0;
-  if (!res.body || !onProgress || !total) return decodeTEFM(await res.arrayBuffer());
+  // Fetch decodes compressed responses, but Content-Length describes the compressed bytes.
+  const encoding = res.headers.get('Content-Encoding');
+  const total = !encoding || encoding === 'identity'
+    ? Number(res.headers.get('Content-Length')) || 0 : 0;
+  if (!res.body || !onProgress || !total) {
+    const buffer = await res.arrayBuffer();
+    if (onProgress) onProgress(1);
+    return decodeTEFM(buffer);
+  }
   const reader = res.body.getReader();
   const out = new Uint8Array(total);
   let got = 0;
