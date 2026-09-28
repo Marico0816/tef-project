@@ -1,0 +1,28 @@
+{
+ "crops": [
+  {
+   "id": "observatory",
+   "title": "Oxford Spires \u00b7 Observatory Quarter",
+   "subtitle": "Segment 100\u2013699 (supplementary test)",
+   "thumb": "observatory/thumb.png"
+  },
+  {
+   "id": "ncd_west",
+   "title": "Newer College \u00b7 Quad, west",
+   "subtitle": "Segment 2700\u20133299",
+   "thumb": "ncd_west/thumb.png"
+  },
+  {
+   "id": "ncd_east",
+   "title": "Newer College \u00b7 Quad, east",
+   "subtitle": "Segment 1300\u20131899",
+   "thumb": "ncd_east/thumb.png"
+  },
+  {
+   "id": "observatory_north",
+   "title": "Oxford Spires \u00b7 Observatory Quarter, north",
+   "subtitle": "Segment 100\u2013699 (supplementary test)",
+   "thumb": "observatory_north/thumb.png"
+  }
+ ]
+}

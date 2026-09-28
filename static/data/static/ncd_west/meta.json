@@ -1,0 +1,93 @@
+{
+ "id": "ncd_west",
+ "title": "Newer College \u00b7 Quad, west",
+ "subtitle": "Segment 2700\u20133299",
+ "segment": "Newer College 2700-3299",
+ "frame": 175,
+ "block_m": 30.0,
+ "centre": [
+  -8.8941,
+  -10.9828,
+  -0.4683
+ ],
+ "camera": {
+  "position": [
+   17.103,
+   -29.931,
+   28.926
+  ],
+  "target": [
+   0,
+   0,
+   0
+  ]
+ },
+ "colormap": {
+  "name": "turbo",
+  "max_cm": 30.0,
+  "unscored": 255
+ },
+ "tls": {
+  "file": "tls.bin",
+  "points": 207783,
+  "bytes": 1246738,
+  "voxel_m": 0.08,
+  "source": "NewerCollege/03_new_college_prior_map/new-college-29-01-2020-1cm-resolution-1stSection.ply"
+ },
+ "methods": [
+  {
+   "key": "T2",
+   "label": "TEF (ours)",
+   "file": "T2.bin",
+   "faces": 515896,
+   "bytes": 3152442,
+   "original_faces": 6243754,
+   "simplification": "vertex clustering 6 cm + quadric",
+   "metrics": {
+    "precision": 62.18,
+    "recall": 97.65,
+    "f10": 75.98,
+    "accuracy_cm": 9.62,
+    "completeness_cm": 3.5
+   },
+   "source": "baselines/out/input_aligned_retest/S2/T2.ply"
+  },
+  {
+   "key": "VF",
+   "label": "VDBFusion",
+   "file": "VF.bin",
+   "faces": 450000,
+   "bytes": 3595946,
+   "original_faces": 816479,
+   "simplification": "quadric",
+   "metrics": {
+    "precision": 47.24,
+    "recall": 97.22,
+    "f10": 63.58,
+    "accuracy_cm": 15.96,
+    "completeness_cm": 3.59
+   },
+   "source": "baselines/out/vdbfusion_formal/S2/VF_r1_w0.5.ply"
+  },
+  {
+   "key": "I5",
+   "label": "PIN-SLAM",
+   "file": "I5.bin",
+   "faces": 450000,
+   "bytes": 3099539,
+   "original_faces": 1547092,
+   "simplification": "quadric",
+   "metrics": {
+    "precision": 49.91,
+    "recall": 94.36,
+    "f10": 65.29,
+    "accuracy_cm": 25.98,
+    "completeness_cm": 4.22
+   },
+   "source": "baselines/out/evidence_test1/S2/I5.ply"
+  }
+ ],
+ "mask": "baselines/out/evidence_test1/S2/mask.npz",
+ "threshold_m": 0.1,
+ "note": "Crop metrics recomputed on original meshes inside this crop and the evaluation mask; not the paper's full-segment scores. Meshes are simplified for display."
+}

@@ -1,0 +1,93 @@
+{
+ "id": "observatory",
+ "title": "Oxford Spires \u00b7 Observatory Quarter",
+ "subtitle": "Segment 100\u2013699 (supplementary test)",
+ "segment": "Oxford Spires Observatory 100-699",
+ "frame": 100,
+ "block_m": 30.0,
+ "centre": [
+  -80.2366,
+  -3.0137,
+  1.7889
+ ],
+ "camera": {
+  "position": [
+   -25.465,
+   23.235,
+   28.926
+  ],
+  "target": [
+   0,
+   0,
+   0
+  ]
+ },
+ "colormap": {
+  "name": "turbo",
+  "max_cm": 30.0,
+  "unscored": 255
+ },
+ "tls": {
+  "file": "tls.bin",
+  "points": 564325,
+  "bytes": 3385990,
+  "voxel_m": 0.08,
+  "source": "OxfordSpires/ground_truth_map/observatory-quarter/merged-clouds-1cm-no-colour.pcd"
+ },
+ "methods": [
+  {
+   "key": "T2",
+   "label": "TEF (ours)",
+   "file": "T2.bin",
+   "faces": 449999,
+   "bytes": 2966438,
+   "original_faces": 5341120,
+   "simplification": "quadric",
+   "metrics": {
+    "precision": 87.58,
+    "recall": 90.73,
+    "f10": 89.13,
+    "accuracy_cm": 6.17,
+    "completeness_cm": 4.34
+   },
+   "source": "baselines/out/input_aligned_retest/B/T2_r1.ply"
+  },
+  {
+   "key": "VF",
+   "label": "VDBFusion",
+   "file": "VF.bin",
+   "faces": 450000,
+   "bytes": 3378197,
+   "original_faces": 626218,
+   "simplification": "quadric",
+   "metrics": {
+    "precision": 82.56,
+    "recall": 82.9,
+    "f10": 82.73,
+    "accuracy_cm": 7.38,
+    "completeness_cm": 6.42
+   },
+   "source": "baselines/out/vdbfusion_formal/B/VF_r1_w0.5.ply"
+  },
+  {
+   "key": "I5",
+   "label": "PIN-SLAM",
+   "file": "I5.bin",
+   "faces": 450000,
+   "bytes": 3123984,
+   "original_faces": 1450976,
+   "simplification": "quadric",
+   "metrics": {
+    "precision": 62.26,
+    "recall": 74.95,
+    "f10": 68.02,
+    "accuracy_cm": 12.08,
+    "completeness_cm": 8.44
+   },
+   "source": "baselines/out/evidence_test2/B/I5_r1.ply"
+  }
+ ],
+ "mask": "baselines/out/evidence_test2/B/mask.npz",
+ "threshold_m": 0.1,
+ "note": "Crop metrics recomputed on original meshes inside this crop and the evaluation mask; not the paper's full-segment scores. Meshes are simplified for display."
+}

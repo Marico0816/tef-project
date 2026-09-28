@@ -1,0 +1,19 @@
+{
+ "sequences": [
+  {
+   "id": "kitti0059",
+   "title": "KITTI 0059 \u00b7 one car",
+   "thumb": "kitti0059/thumb.jpg"
+  },
+  {
+   "id": "kitti0005",
+   "title": "KITTI 0005 \u00b7 van and cyclist",
+   "thumb": "kitti0005/thumb.jpg"
+  },
+  {
+   "id": "kitti0014",
+   "title": "KITTI 0014 \u00b7 nine vehicles",
+   "thumb": "kitti0014/thumb.jpg"
+  }
+ ]
+}

@@ -1,0 +1,93 @@
+{
+ "id": "observatory_north",
+ "title": "Oxford Spires \u00b7 Observatory Quarter, north",
+ "subtitle": "Segment 100\u2013699 (supplementary test)",
+ "segment": "Oxford Spires Observatory 100-699",
+ "frame": 500,
+ "block_m": 30.0,
+ "centre": [
+  -56.8015,
+  22.8605,
+  -0.5776
+ ],
+ "camera": {
+  "position": [
+   -5.325,
+   -34.058,
+   28.925
+  ],
+  "target": [
+   0,
+   0,
+   0
+  ]
+ },
+ "colormap": {
+  "name": "turbo",
+  "max_cm": 30.0,
+  "unscored": 255
+ },
+ "tls": {
+  "file": "tls.bin",
+  "points": 261531,
+  "bytes": 1569226,
+  "voxel_m": 0.08,
+  "source": "OxfordSpires/ground_truth_map/observatory-quarter/merged-clouds-1cm-no-colour.pcd"
+ },
+ "methods": [
+  {
+   "key": "T2",
+   "label": "TEF (ours)",
+   "file": "T2.bin",
+   "faces": 450000,
+   "bytes": 3343926,
+   "original_faces": 2454294,
+   "simplification": "quadric",
+   "metrics": {
+    "precision": 87.28,
+    "recall": 95.98,
+    "f10": 91.42,
+    "accuracy_cm": 5.69,
+    "completeness_cm": 2.81
+   },
+   "source": "baselines/out/input_aligned_retest/B/T2_r1.ply"
+  },
+  {
+   "key": "VF",
+   "label": "VDBFusion",
+   "file": "VF.bin",
+   "faces": 305939,
+   "bytes": 2282002,
+   "original_faces": 305941,
+   "simplification": "none",
+   "metrics": {
+    "precision": 84.67,
+    "recall": 91.36,
+    "f10": 87.89,
+    "accuracy_cm": 7.52,
+    "completeness_cm": 3.71
+   },
+   "source": "baselines/out/vdbfusion_formal/B/VF_r1_w0.5.ply"
+  },
+  {
+   "key": "I5",
+   "label": "PIN-SLAM",
+   "file": "I5.bin",
+   "faces": 449999,
+   "bytes": 3126645,
+   "original_faces": 727708,
+   "simplification": "quadric",
+   "metrics": {
+    "precision": 65.95,
+    "recall": 88.49,
+    "f10": 75.57,
+    "accuracy_cm": 10.66,
+    "completeness_cm": 4.71
+   },
+   "source": "baselines/out/evidence_test2/B/I5_r1.ply"
+  }
+ ],
+ "mask": "baselines/out/evidence_test2/B/mask.npz",
+ "threshold_m": 0.1,
+ "note": "Crop metrics recomputed on original meshes inside this crop and the evaluation mask; not the paper's full-segment scores. Meshes are simplified for display."
+}
