@@ -9,8 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
-<link rel="stylesheet" href="static/css/style.css?v=20260927d">
+<link rel="stylesheet" href="static/css/style.css?v=20260927e">
 <script type="importmap">
 {
   "imports": {
@@ -114,7 +113,7 @@
     </g>
     <circle cx="78" cy="104" r="13" fill="none" stroke="#3c4043" stroke-width="1.5"/>
     <circle cx="78" cy="104" r="7" fill="#3c4043"/>
-    <text class="lbl" x="258" y="124">scan Pₜ</text>
+    <text class="lbl" x="256" y="124">LiDAR scan</text>
     <text class="lbl muted" x="58" y="137">pose (given)</text>
     <rect x="64" y="176" width="24" height="16" rx="3" fill="#3c4043"/>
     <circle cx="76" cy="184" r="4.5" fill="#fff"/>
@@ -125,7 +124,7 @@
     <rect x="148" y="184" width="30" height="9" rx="3" fill="#5f6368"/>
     <rect x="154" y="178" width="17" height="8" rx="3" fill="#5f6368"/>
     <circle cx="154" cy="194" r="2.6" fill="#202124"/><circle cx="172" cy="194" r="2.6" fill="#202124"/>
-    <text class="lbl" x="208" y="190">image Iₜ</text>
+    <text class="lbl" x="208" y="190">camera image</text>
     <text class="cap" x="58" y="236">deskewed · 0.5–50 m · 12 000 returns</text>
     <text class="cap" x="58" y="253">poses are fixed, never optimised</text>
   </g>
@@ -134,9 +133,9 @@
   <g class="stage" data-stage="ellipsoid" tabindex="0" role="button" aria-label="Stage 2: local ellipsoid with normal and thickness">
     <rect class="card" x="360" y="34" width="270" height="236" rx="18"/>
     <circle class="badge" cx="384" cy="60" r="12"/><text class="badge-t" x="384" y="64.5">2</text>
-    <text class="title" x="404" y="65">Local ellipsoid · n̂, τ</text>
+    <text class="title" x="404" y="65">Local surface ellipsoid</text>
     <rect x="392" y="84" width="206" height="118" rx="6" fill="none" stroke="#bdc1c6" stroke-dasharray="4 3"/>
-    <text class="lbl tiny muted" x="392" y="216">voxel statistics (n, Σp, Σppᵀ) at 0.25/0.5/1 m</text>
+    <text class="lbl tiny muted" x="392" y="216">point statistics in 0.25 / 0.5 / 1 m voxels</text>
     <g fill="#3c4043">
       <circle cx="404" cy="161" r="2.2"/><circle cx="418" cy="155" r="2.2"/><circle cx="430" cy="159" r="2.2"/>
       <circle cx="443" cy="149" r="2.2"/><circle cx="456" cy="152" r="2.2"/><circle cx="468" cy="143" r="2.2"/>
@@ -146,13 +145,13 @@
     </g>
     <ellipse cx="495" cy="140" rx="80" ry="13" transform="rotate(-12 495 140)" fill="#1a73e8" fill-opacity="0.12" stroke="#1a73e8" stroke-width="1.6"/>
     <line x1="495" y1="140" x2="484.6" y2="92" stroke="#1a73e8" stroke-width="2" marker-end="url(#arr-blue)"/>
-    <text class="lbl blue" x="468" y="100">n̂</text>
+    <text class="lbl blue" x="430" y="100">normal</text>
     <line x1="553" y1="114" x2="558" y2="140" stroke="#202124" stroke-width="1.3" marker-start="url(#arr)" marker-end="url(#arr)"/>
-    <text class="lbl" x="565" y="136">τ</text>
+    <text class="lbl tiny" x="556" y="157" text-anchor="middle">thickness</text>
     <line x1="416.8" y1="156.6" x2="573.2" y2="123.4" stroke="#1a73e8" stroke-width="1" stroke-dasharray="3 3"/>
-    <text class="lbl" x="416" y="186">σ₁ along the tangent plane</text>
-    <text class="cap" x="378" y="236">finest scale with n ≥ 30, √(λ₀/λ₂) ≤ 0.15</text>
-    <text class="cap" x="378" y="253">τ = max(√λ₀, 2 cm) · confidence n/(n+30)</text>
+    <text class="lbl" x="416" y="186">extent along the surface</text>
+    <text class="cap" x="378" y="236">finest voxel with enough, flat-lying points</text>
+    <text class="cap" x="378" y="253">thickness from the spread, at least 2 cm</text>
   </g>
 
   <!-- ===== 3 samples ===== -->
@@ -179,23 +178,23 @@
     <circle cx="815" cy="140" r="4.6" fill="#fff" stroke="#5f6368" stroke-width="1.3"/>
     <circle cx="830" cy="145.4" r="4.6" fill="#e8710a" fill-opacity="0.6"/>
     <circle cx="845.1" cy="150.9" r="4.6" fill="#e8710a"/>
-    <text class="lbl blue" x="714" y="126">s &gt; 0</text>
-    <text class="lbl orange" x="834" y="178">s &lt; 0</text>
+    <text class="lbl blue" x="700" y="146">free side</text>
+    <text class="lbl orange" x="834" y="178">behind</text>
     <text class="lbl muted" x="786" y="104">tangent copies</text>
     <text class="lbl tiny muted" x="700" y="200">ray from the sensor → return → behind</text>
-    <text class="cap" x="698" y="236">s = clip(−d·cos θ / 3τ, −1, 1)</text>
-    <text class="cap" x="698" y="253">w = confidence × Gaussian in dₙ/τ</text>
+    <text class="cap" x="698" y="236">distance to the surface, scaled by thickness</text>
+    <text class="cap" x="698" y="253">weight falls off away from the surface</text>
   </g>
 
   <!-- row-1 arrows -->
   <line x1="312" y1="152" x2="356" y2="152" stroke="#5f6368" stroke-width="1.6" marker-end="url(#arr)"/>
   <text class="lbl tiny" x="334" y="144" text-anchor="middle">returns</text>
   <line x1="632" y1="152" x2="676" y2="152" stroke="#5f6368" stroke-width="1.6" marker-end="url(#arr)"/>
-  <text class="lbl tiny" x="654" y="144" text-anchor="middle">n̂, τ, σ</text>
+  <text class="lbl tiny" x="654" y="144" text-anchor="middle">shape</text>
 
   <!-- 3 -> 4 carriage return -->
   <path d="M815 272 L815 300 L175 300 L175 330" fill="none" stroke="#5f6368" stroke-width="1.6" marker-end="url(#arr)"/>
-  <text class="lbl tiny" x="495" y="293" text-anchor="middle">samples (s, w) with timestamps</text>
+  <text class="lbl tiny" x="495" y="293" text-anchor="middle">weighted samples with timestamps</text>
 
   <!-- ===== 4 splat ===== -->
   <g class="stage" data-stage="splat" tabindex="0" role="button" aria-label="Stage 4: trilinear splatting to lattice vertices">
@@ -227,7 +226,7 @@
     <line x1="80" y1="378" x2="118" y2="378" stroke="#5f6368" stroke-width="1" marker-start="url(#arr)" marker-end="url(#arr)"/>
     <text class="lbl tiny muted" x="124" y="381">4 cm</text>
     <text class="lbl tiny muted" x="202" y="444">trilinear weights</text>
-    <text class="cap" x="58" y="536">each node keeps Σ w·s and W</text>
+    <text class="cap" x="58" y="536">each vertex accumulates weighted samples</text>
     <text class="cap" x="58" y="553">separately for every 1 s block</text>
   </g>
 
@@ -253,16 +252,15 @@
       </g>
     </g>
     <text class="lbl tiny muted" x="384" y="433">each block counts at most once</text>
-    <text class="lbl green" x="384" y="456">hit blocks h = 2</text>
-    <text class="lbl red" x="384" y="474">pass blocks p = 4</text>
-    <line x1="500" y1="470" x2="606" y2="470" stroke="#9aa0a6" stroke-dasharray="3 3"/>
-    <text class="lbl tiny muted" x="608" y="473" text-anchor="end">0</text>
-    <path d="M500 452 C520 452, 530 494, 553 494 C576 494, 586 452, 606 452" fill="none" stroke="#9aa0a6" stroke-width="2"/>
-    <path d="M500 450 C520 450, 530 462, 553 462 C576 462, 586 450, 606 450" fill="none" stroke="#1a73e8" stroke-width="2.2"/>
-    <text class="lbl tiny muted" x="556" y="508" text-anchor="middle">fused s₀ (ghost)</text>
-    <text class="lbl tiny blue" x="606" y="444" text-anchor="end">revised s*</text>
-    <text class="cap" x="378" y="536">bounded block weight min(max w, W)</text>
-    <text class="cap" x="378" y="553">target on s₀ ≤ 0 → local regularisation</text>
+    <text class="lbl tiny green" x="384" y="456">2 blocks saw a surface</text>
+    <text class="lbl tiny red" x="384" y="474">4 blocks saw rays pass</text>
+    <line x1="528" y1="470" x2="606" y2="470" stroke="#9aa0a6" stroke-dasharray="3 3"/>
+        <path d="M528 452 C541 452, 548 494, 567 494 C586 494, 593 452, 606 452" fill="none" stroke="#9aa0a6" stroke-width="2"/>
+    <path d="M528 450 C541 450, 548 462, 567 462 C586 462, 593 450, 606 450" fill="none" stroke="#1a73e8" stroke-width="2.2"/>
+    <text class="lbl tiny muted" x="567" y="508" text-anchor="middle">fused: ghost surface</text>
+    <text class="lbl tiny blue" x="606" y="444" text-anchor="end">revised</text>
+    <text class="cap" x="378" y="536">each block's weight is capped</text>
+    <text class="cap" x="378" y="553">conflicts revise the field, then smoothing</text>
   </g>
 
   <!-- ===== 6 mesh ===== -->
@@ -292,17 +290,17 @@
       <circle cx="739" cy="481" r="2.6"/><circle cx="767.5" cy="471.5" r="2.6"/><circle cx="786.5" cy="452.5" r="2.6"/>
       <circle cx="815" cy="443" r="2.6"/><circle cx="843.5" cy="433.5" r="2.6"/><circle cx="862.5" cy="414.5" r="2.6"/><circle cx="891" cy="405" r="2.6"/>
     </g>
-    <text class="lbl tiny blue" x="724" y="380">s* &gt; 0</text>
-    <text class="lbl tiny orange" x="906" y="516" text-anchor="end">s* &lt; 0</text>
-    <text class="cap" x="698" y="536">gates: weight · observed corners · crossing</text>
-    <text class="cap" x="698" y="553">→ background mesh M_bg up to time t</text>
+    <text class="lbl tiny blue" x="724" y="380">free space</text>
+    <text class="lbl tiny orange" x="906" y="516" text-anchor="end">inside</text>
+    <text class="cap" x="698" y="536">checks: weight, observed corners, crossing</text>
+    <text class="cap" x="698" y="553">→ background mesh at each time</text>
   </g>
 
   <!-- row-2 arrows -->
   <line x1="312" y1="452" x2="356" y2="452" stroke="#5f6368" stroke-width="1.6" marker-end="url(#arr)"/>
-  <text class="lbl tiny" x="334" y="444" text-anchor="middle">s̄, W</text>
+  <text class="lbl tiny" x="334" y="444" text-anchor="middle">averages</text>
   <line x1="632" y1="452" x2="676" y2="452" stroke="#1a73e8" stroke-width="1.8" marker-end="url(#arr-blue)"/>
-  <text class="lbl tiny blue" x="654" y="444" text-anchor="middle">s*</text>
+  <text class="lbl tiny blue" x="654" y="444" text-anchor="middle">revised</text>
 
   <!-- ===== object branch ===== -->
   <g class="stage branch" data-stage="objects" tabindex="0" role="button" aria-label="Object branch for rigid vehicles: ownership, 4-DoF pose, object-local TSDF, and the time-indexed scene">
@@ -313,34 +311,34 @@
     <text class="lbl muted" x="74" y="708">a confirmed ID keeps its</text>
     <text class="lbl muted" x="74" y="725">points, even when stopped</text>
     <rect class="sub" x="286" y="664" width="214" height="96" rx="10"/>
-    <text class="lbl strong" x="300" y="688">4-DoF pose (x, y, z, ψ)</text>
-    <text class="lbl muted" x="300" y="708">point-to-plane registration</text>
+    <text class="lbl strong" x="300" y="688">Vehicle pose</text>
+    <text class="lbl muted" x="300" y="708">position + heading from LiDAR</text>
     <text class="lbl muted" x="300" y="725">+ optional image refinement</text>
-    <text class="lbl muted" x="300" y="742">(30 bounded Adam steps)</text>
+    <text class="lbl muted" x="300" y="742">(checked before it is used)</text>
     <rect class="sub" x="536" y="664" width="186" height="96" rx="10"/>
-    <text class="lbl strong" x="550" y="688">Object-local TSDF</text>
-    <text class="lbl muted" x="550" y="708">3 cm grid; fused only after</text>
-    <text class="lbl muted" x="550" y="725">an accepted LiDAR pose</text>
+    <text class="lbl strong" x="550" y="688">Vehicle shape</text>
+    <text class="lbl muted" x="550" y="708">fused in its own frame, only</text>
+    <text class="lbl muted" x="550" y="725">after an accepted LiDAR pose</text>
     <rect class="sub accent" x="758" y="664" width="176" height="96" rx="10"/>
-    <text class="lbl strong" x="772" y="688">Scene slice M(t)</text>
-    <text class="lbl muted" x="772" y="708">M_bg(≤t) ∪ T(t)·M_obj(≤t)</text>
+    <text class="lbl strong" x="772" y="688">Scene at each time</text>
+    <text class="lbl muted" x="772" y="708">background + posed vehicles</text>
     <text class="lbl muted" x="772" y="725">timestamped meshes</text>
     <line x1="252" y1="712" x2="284" y2="712" stroke="#5f6368" stroke-width="1.5" marker-end="url(#arr)"/>
     <line x1="502" y1="712" x2="534" y2="712" stroke="#5f6368" stroke-width="1.5" marker-end="url(#arr)"/>
     <line x1="724" y1="712" x2="756" y2="712" stroke="#5f6368" stroke-width="1.5" marker-end="url(#arr)"/>
     <text class="lbl tiny" x="268" y="704" text-anchor="middle">points</text>
     <text class="lbl tiny" x="518" y="704" text-anchor="middle">pose</text>
-    <text class="lbl tiny" x="740" y="704" text-anchor="middle">M_obj</text>
+    <text class="lbl tiny" x="740" y="704" text-anchor="middle">mesh</text>
   </g>
 
   <!-- background into the scene slice; scan + image into the object branch -->
   <line x1="846" y1="572" x2="846" y2="660" stroke="#5f6368" stroke-width="1.6" marker-end="url(#arr)"/>
-  <text class="lbl tiny" x="853" y="600">M_bg</text>
+  <text class="lbl tiny" x="853" y="600">background mesh</text>
   <path d="M40 186 L20 186 L20 712 L56 712" fill="none" stroke="#9aa0a6" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#arr-grey)"/>
-  <text class="lbl tiny muted" x="14" y="470" transform="rotate(-90 14 470)" text-anchor="middle">scan Pₜ + image Iₜ</text>
+  <text class="lbl tiny muted" x="14" y="470" transform="rotate(-90 14 470)" text-anchor="middle">scan + camera image</text>
 </svg>
     </div>
-    <figcaption>TEF pipeline. Each return gets a local ellipsoid (normal n̂, thickness τ) from multi-scale covariance; signed samples along its ray and in its tangent plane are splatted to the vertices of a sparse 4&nbsp;cm lattice; per-node, per-second hit and pass evidence revises the fused field before Surface Nets extracts the background mesh. Rigid vehicles are reconstructed in their own frame and placed at each timestamp. <b>Click a stage for details.</b></figcaption>
+    <figcaption>TEF pipeline. Each LiDAR return gets a local surface ellipsoid (a normal and a thickness) from the points around it; weighted samples along its ray and across the surface are passed to the vertices of a sparse 4&nbsp;cm grid; for every vertex, one-second blocks that saw a surface and blocks whose rays passed through it revise the fused result before Surface Nets extracts the background mesh. Vehicles are reconstructed in their own frame and placed into the scene at each timestamp. <b>Click a stage for details.</b></figcaption>
   </figure>
 
   <div class="stage-detail" id="stage-detail" aria-live="polite"></div>
@@ -544,7 +542,6 @@
   <div class="lightbox-caption"></div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" defer></script>
-<script type="module" src="static/js/main.js?v=20260927d"></script>
+<script type="module" src="static/js/main.js?v=20260927e"></script>
 </body>
 </html>
