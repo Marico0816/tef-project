@@ -1,56 +1,61 @@
-// Stage details for the pipeline diagram. Text and equations follow the manuscript's method section.
+// Stage details for the pipeline diagram: the algorithm in words, following the manuscript's method section.
 const STAGES = {
   inputs: {
     title: '① LiDAR + camera inputs',
-    text: 'Each scan P<sub>t</sub> is deskewed with the externally supplied trajectory in 2&nbsp;ms bins, filtered to 0.5–50&nbsp;m and deterministically limited to 12&nbsp;000 returns per frame. Sensor poses are fixed; TEF never optimises them. The static mapper is LiDAR-only: calibrated camera images are used by the object branch (pose refinement) and for display colours.',
-    eq: ['P_t,\\qquad T_{WL}(t)\\ \\text{(given)},\\qquad I_t\\ \\text{(object branch only)}'],
+    text: [
+      'Each LiDAR scan is deskewed with the externally supplied trajectory, limited to 0.5–50 m and capped at 12&nbsp;000 returns per frame.',
+      'Sensor poses are given and never optimised.',
+      'The static mapper uses LiDAR only; calibrated camera images are used by the vehicle branch (pose refinement) and for display colours.',
+    ],
   },
   ellipsoid: {
-    title: '② Local ellipsoid: normal n̂ and thickness τ',
-    text: 'Three voxel scales (0.25, 0.5 and 1.0&nbsp;m) keep running statistics (n, Σp, Σpp<sup>T</sup>); the current scan updates them before its returns query them. Each return takes the finest scale with n&nbsp;≥&nbsp;30 and √(λ<sub>0</sub>/λ<sub>2</sub>)&nbsp;≤&nbsp;0.15. The smallest-eigenvalue direction gives the sensor-facing normal, the other two span the tangent plane. This is a dispersion test, not a guarantee of a single plane.',
-    eq: ['\\hat{\\mathbf n}=\\mathbf e_0,\\qquad \\tau=\\max\\!\\big(\\sqrt{\\lambda_0},\\,0.02\\,\\mathrm m\\big),\\qquad \\sigma_{1,2}=\\max\\!\\big(\\sqrt{\\lambda_{1,2}},\\,v/4\\big),\\qquad c=\\frac{n}{n+30}'],
+    title: '② Local surface ellipsoid',
+    text: [
+      'Point statistics are kept in voxels of three sizes (0.25, 0.5 and 1&nbsp;m) and updated with every new scan before its returns are processed.',
+      'For each return, the finest voxel that holds enough points lying close to a plane describes the local surface as a flat ellipsoid.',
+      'Its thin axis gives the surface normal and a thickness (at least 2&nbsp;cm); its two long axes give how far the surface extends; the number of points gives a confidence.',
+    ],
   },
   samples: {
-    title: '③ Signed samples along the ray',
-    text: 'Samples near each return carry a dimensionless signed value — positive on the free side, negative behind the surface — normalised by the per-return truncation 3τ, so different returns may use different physical truncation lengths at the same node. The samples closest to the surface are copied as symmetric pairs in the tangent plane with anisotropic Gaussian weights; a copy keeps its central sample\'s value. Returns without a valid neighbourhood fall back to a ray-orthogonal disc and a global 8&nbsp;cm truncation.',
-    eq: ['s=\\operatorname{clip}\\!\\Big(-\\frac{d\\,\\operatorname{clip}(|\\cos\\theta|,0.05,1)}{3\\tau},\\,-1,\\,1\\Big),\\qquad w=(1-0.35|s|)\\,c\\,\\exp\\!\\Big[-\\tfrac12\\big(d_n/\\tau\\big)^2\\Big]'],
+    title: '③ Weighted samples along the ray',
+    text: [
+      'Samples are placed just in front of and just behind each return along its ray. Each records its distance to the surface, measured along the normal and scaled by the local thickness: positive on the free side, negative behind.',
+      'Each sample gets a weight that drops away from the surface and for less confident neighbourhoods.',
+      'The samples closest to the surface are also copied sideways within the local surface, which fills the gaps between neighbouring laser rings.',
+    ],
   },
   splat: {
-    title: '④ Splat to the lattice vertices',
-    text: 'Every sample is splatted trilinearly onto the eight corners of its cell in a sparse 4&nbsp;cm GPU lattice. Observations are grouped into one-second blocks, and each node keeps a weighted mean per block.',
-    eq: ['\\bar s_{ib}=\\frac{\\sum_{a\\in\\mathcal S_{ib}} w_a\\,s_a}{W_{ib}},\\qquad W_{ib}=\\sum_{a\\in\\mathcal S_{ib}} w_a'],
+    title: '④ Passing samples to the grid vertices',
+    text: [
+      'Each sample is shared among the eight corners of its cell in a sparse 4&nbsp;cm GPU grid, with more weight for the nearer corners.',
+      'Observations are grouped into one-second blocks, and every grid vertex keeps a weighted average for each block.',
+    ],
   },
   evidence: {
     title: '⑤ Temporal-block evidence (TEF core)',
-    text: 'Blocks are fused with a bounded weight, so a densely sampled second cannot gain influence from its sample count alone. Separately, each node counts the blocks that saw a surface there (h) and the blocks whose measured rays passed through it (p), each at most once per block; a missing observation is not a pass. On the interior side of the fused field their balance sets a conflict target, and damped Jacobi updates on the changed region regularise the result.',
-    eq: [
-      '\\omega_{ib}=\\min\\!\\big(\\max_{a} w_a,\\;W_{ib}\\big),\\qquad s_{0,i}=\\frac{\\sum_b\\omega_{ib}\\,\\bar s_{ib}}{\\sum_b\\omega_{ib}}',
-      '\\tilde s_i=-\\max\\!\\big(|s_{0,i}|,\\epsilon\\big)\\,\\frac{h_i-p_i}{h_i+p_i}\\quad\\text{if } s_{0,i}\\le 0,\\qquad c_i=\\frac{h_i+p_i}{3}',
-      'E(\\mathbf s)=\\sum_i d_i\\,c_i\\,(s_i-\\tilde s_i)^2+\\lambda\\!\\sum_{(i,j)\\in\\mathcal E}(s_i-s_j)^2,\\qquad \\lambda=0.3',
+    text: [
+      'The blocks are combined with a capped weight, so a second that happens to contain many samples cannot outvote the others by sample count alone.',
+      'Separately, each vertex counts how many blocks saw a surface there and how many blocks had measured rays pass through it — at most once per block. A missing observation does not count as a pass.',
+      'Where rays keep passing through space that the fused result still treats as solid, the vertex is pushed back towards free space; a local smoothing step keeps the neighbourhood consistent.',
     ],
   },
   mesh: {
-    title: '⑥ Surface Nets extraction',
-    text: 'The mesh is extracted from the revised field with Surface Nets after node-weight, observed-corner, crossing-probability and face-quality checks. Sparse GPU storage, local remeshing and tiled final extraction keep the process incremental.',
-    eq: ['\\mathcal M_{\\mathrm{bg}}^{\\le t}=\\operatorname{SurfaceNets}\\big(\\mathbf s^{*}\\big)'],
+    title: '⑥ Mesh extraction',
+    text: [
+      'The surface is extracted from the revised grid with Surface Nets.',
+      'A face is kept only where the grid has enough weight, enough observed corners and a reliable surface crossing.',
+      'Sparse GPU storage, local re-meshing and tiled extraction keep the process incremental.',
+    ],
   },
   objects: {
-    title: 'Object branch · rigid vehicles',
-    text: 'A confirmed object keeps its identity — and keeps receiving its observations — when it stops. Its 4-DoF state is estimated by robust point-to-plane registration against a fixed initial object mesh; an optional image step runs 30 bounded Adam updates on tracked, mesh-anchored features and is accepted only after image and geometry checks. Shape is fused into an object-local TSDF (3&nbsp;cm grid) only after an accepted LiDAR registration, and each object mesh is placed in the world at its timestamp.',
-    eq: [
-      '\\boldsymbol\\xi_t=(x,y,z,\\psi),\\qquad \\boldsymbol\\xi=\\boldsymbol\\xi_{\\mathrm{base}}+D\\tanh\\mathbf a',
-      '\\mathcal M(t)=\\mathcal M_{\\mathrm{bg}}^{\\le t}\\;\\cup\\;\\bigcup_{k\\in\\mathcal O_t} T_{WO_k}(t)\\,\\mathcal M_{O_k}^{\\le t}',
+    title: 'Vehicle branch (4D extension)',
+    text: [
+      'A confirmed vehicle keeps its identity — and keeps receiving its points — when it stops.',
+      'Its position and heading are estimated by aligning its current points to its own mesh. An optional image step refines the pose with tracked features on the vehicle and is accepted only after image and geometry checks.',
+      'The vehicle\'s shape is fused in its own frame only after an accepted LiDAR alignment, and at every timestamp the vehicle meshes are placed into the background map.',
     ],
   },
 };
-
-function renderMath(tex) {
-  const el = document.createElement('div');
-  el.className = 'eq';
-  if (window.katex) window.katex.render(tex, el, { displayMode: true, throwOnError: false });
-  else el.textContent = tex;
-  return el;
-}
 
 export function initMethod(root) {
   const detail = root.querySelector('#stage-detail');
@@ -58,8 +63,7 @@ export function initMethod(root) {
   const show = key => {
     const s = STAGES[key];
     stages.forEach(g => g.classList.toggle('active', g.dataset.stage === key));
-    detail.innerHTML = `<h3>${s.title}</h3><p>${s.text}</p>`;
-    s.eq.forEach(tex => detail.appendChild(renderMath(tex)));
+    detail.innerHTML = `<h3>${s.title}</h3>` + s.text.map(t => `<p>${t}</p>`).join('');
   };
   stages.forEach(g => {
     g.addEventListener('click', () => show(g.dataset.stage));
