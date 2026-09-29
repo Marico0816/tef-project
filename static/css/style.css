@@ -36,6 +36,7 @@ body {
 h1, h2 { color: var(--ink); text-align: center; font-weight: 500; }
 h1 { font-size: 2.4em; line-height: 1.25; margin: 0 0 0.5em; }
 h1 .brand { color: var(--blue); }
+.project-subtitle { text-align: center; color: var(--muted); font-size: 1.05em; margin: 0 0 24px; }
 h2 { font-size: 1.8em; margin: 1.5em 0 1em; }
 h3 { color: var(--ink); font-weight: 500; font-size: 1.15em; margin: 1.6em 0 0.4em; }
 
@@ -64,22 +65,17 @@ h3 { color: var(--ink); font-weight: 500; font-size: 1.15em; margin: 1.6em 0 0.4
 }
 .abstract p, .method p, .results p, .acknowledgements p { text-align: justify; font-size: 0.92em; }
 
-/* ---------- overview video slot ---------- */
+/* ---------- overview video ---------- */
 .video-container {
   background-color: var(--card); border-radius: 30px; margin-bottom: 30px;
   border: 1px solid var(--line); overflow: hidden;
 }
 .video-head { display: flex; align-items: center; gap: 10px; padding: 24px 30px 0; }
 .video-head h2 { margin: 0 0 16px; font-size: 1.5em; text-align: left; }
-.video-placeholder {
-  margin: 0 10px; aspect-ratio: 16 / 9; border-radius: 20px;
-  background: repeating-linear-gradient(135deg, #f1f3f4 0 14px, #eceff1 14px 28px);
-  border: 1.5px dashed #c4c7c5; display: flex; align-items: center; justify-content: center;
-}
-.ph-inner { text-align: center; color: var(--faint); }
-.ph-icon { width: 56px; height: 56px; color: #9aa0a6; }
-.ph-title { font-size: 1.15em; font-weight: 500; color: var(--muted); margin-top: 8px; }
-.ph-sub { font-size: .85em; }
+.overview-stage { margin: 0 10px; }
+.video-container .overview-caption { margin: 16px 30px 0; }
+.implementation-note { color: var(--muted); margin-top: 20px; }
+.viz-caption.extension-intro { margin: 0 0 18px; }
 .chapters { display: flex; justify-content: center; gap: 5px; padding: 18px 30px 28px; flex-wrap: wrap; }
 .chapters button {
   padding: 5px 7px; border: 3px solid transparent; border-radius: 6px; cursor: pointer;
