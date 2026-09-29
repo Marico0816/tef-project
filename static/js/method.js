@@ -44,11 +44,11 @@ const STAGES = {
     text: [
       'The surface is extracted from the revised grid with Surface Nets.',
       'A face is kept only where the grid has enough weight, enough observed corners and a reliable surface crossing.',
-      'Sparse GPU storage, local re-meshing and tiled extraction keep the process incremental.',
+      'For the static comparison table, scans are fused in time order on the GPU and the mesh is extracted after the final block. The development ablation used extraction every 10 seconds; dynamic examples replay saved mesh revisions.',
     ],
   },
   objects: {
-    title: 'Vehicle branch (4D extension)',
+    title: 'Vehicle branch (exploratory extension)',
     text: [
       'A confirmed vehicle keeps its identity — and keeps receiving its points — when it stops.',
       'Its position and heading are estimated by aligning its current points to its own mesh. An optional image step refines the pose with tracked features on the vehicle and is accepted only after image and geometry checks.',

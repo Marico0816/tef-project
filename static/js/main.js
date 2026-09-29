@@ -1,10 +1,10 @@
-import { initMethod } from './method.js';
+import { initMethod } from './method.js?v=20260929b';
 import { StaticComparison } from './static_viewer.js';
 import { DynamicViewer } from './dynamic_viewer.js';
-import { VideoGallery } from './videos.js';
+import { VideoGallery } from './videos.js?v=20260929b';
 import { initLightbox } from './gallery.js';
 
-// Chapter buttons jump to page sections until the overview video exists.
+// Chapter buttons navigate the page independently of video playback.
 document.querySelectorAll('.chapters button').forEach(b =>
   b.addEventListener('click', () => document.getElementById(b.dataset.target)?.scrollIntoView({ behavior: 'smooth', block: 'start' })));
 
@@ -20,6 +20,12 @@ document.querySelectorAll('.collapsible h2').forEach(h => {
 
 initMethod(document.getElementById('method'));
 initLightbox();
+
+// The overview uses native controls and pauses when the reader leaves its card.
+const overviewVideo = document.getElementById('overview-video');
+new IntersectionObserver(entries => {
+  if (!entries.some(e => e.isIntersecting)) overviewVideo.pause();
+}, { threshold: 0.2 }).observe(overviewVideo);
 
 // The result video only downloads and plays while its card is on screen.
 const videos = new VideoGallery(document.getElementById('videos'));
