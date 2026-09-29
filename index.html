@@ -4,12 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TEF: Temporal Evidence Fusion</title>
-<meta name="description" content="TEF: Temporal Evidence Fusion for 4D LiDAR Reconstruction — project page with interactive static comparisons and a 4D vehicle reconstruction viewer.">
+<meta name="description" content="TEF: Temporal Evidence Fusion for LiDAR surface reconstruction with fixed poses. Explore static mesh comparisons, measured trade-offs and an exploratory object-centric extension.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231a73e8'/%3E%3Cpath d='M16 42 L28 22 L36 34 L48 18' stroke='white' stroke-width='6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="static/css/style.css?v=20260927e">
+<link rel="stylesheet" href="static/css/style.css?v=20260929b">
 <script type="importmap">
 {
   "imports": {
@@ -21,7 +21,8 @@
 </head>
 <body>
 
-<h1><span class="brand">TEF</span>: Temporal Evidence Fusion<br>for 4D LiDAR Reconstruction</h1>
+<h1><span class="brand">TEF</span>: Temporal Evidence Fusion</h1>
+<p class="project-subtitle">LiDAR surface reconstruction with an exploratory object-centric extension</p>
 
 <!-- Author list, affiliations and venue are placeholders until the rights holders confirm them. -->
 <div class="authors"><span>Anonymous authors</span></div>
@@ -34,25 +35,25 @@
   <a href="https://github.com/Marico0816/TEF" target="_blank" rel="noopener noreferrer" title="TEF code repository">code</a>
 </div>
 
-<!-- ============================ Overview (video slot) ============================ -->
+<!-- ============================ Overview (saved reconstruction) ============================ -->
 <div class="video-container" id="overview">
   <div class="video-head">
-    <h2>Overview</h2>
+    <h2>LiDAR Surface Reconstruction</h2>
   </div>
-  <div class="video-placeholder" role="img" aria-label="Overview video placeholder">
-    <div class="ph-inner">
-      <svg class="ph-icon" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="22" fill="none" stroke="currentColor" stroke-width="2"/><path d="M19 15 L35 24 L19 33 Z" fill="currentColor"/></svg>
-      <div class="ph-title">Overview video coming soon</div>
-      <div class="ph-sub">This 16:9 slot is reserved for the narrated overview.</div>
-    </div>
+  <div class="video-stage overview-stage">
+    <video id="overview-video" controls muted loop playsinline preload="none" poster="static/videos/static_keble.jpg" aria-label="Offline fly-through of the TEF surface reconstruction at Keble College" aria-describedby="overview-caption">
+      <source src="static/videos/static_keble.mp4" type="video/mp4">
+      Your browser does not support embedded video. <a href="static/videos/static_keble.mp4">Open the reconstruction video.</a>
+    </video>
   </div>
-  <!-- Until the video exists, the chapter buttons jump to page sections. -->
+  <p class="viz-caption overview-caption" id="overview-caption"><b>Oxford Spires · Keble College.</b> Surface reconstructed from 540 scans with fixed sensor poses and 12&nbsp;000 returns per frame. TLS colours are for display only. This is an offline fly-through of the saved final mesh; playback speed does not measure reconstruction speed.</p>
+  <!-- Chapter buttons navigate the page independently of video playback. -->
   <div class="chapters">
     <button data-target="abstract">Abstract</button>
     <button data-target="method">Method</button>
     <button data-target="videos">Videos</button>
     <button data-target="static-results">Static comparison</button>
-    <button data-target="dynamic-results">4D reconstruction</button>
+    <button data-target="dynamic-results">Object extension</button>
     <button data-target="gallery">Gallery</button>
     <button data-target="results">Quantitative results</button>
     <button data-target="citation">Citation</button>
@@ -62,7 +63,8 @@
 <!-- ============================ Abstract ============================ -->
 <div class="abstract" id="abstract">
   <h2>Abstract</h2>
-  <p>Accumulating LiDAR scans can retain incompatible surfaces from different times, even when sensor poses are fixed. In dynamic scenes, simply removing these surfaces also removes the objects that a time-resolved reconstruction should preserve. We present Temporal Evidence Fusion (TEF), a surface-fusion method organized around this distinction. For the background, TEF aggregates observations into temporal blocks, limits each block's fusion weight, and uses surface-hit and free-space traversal evidence to revise a normalized signed-distance field. An object-centric extension maintains local object geometry and composes it with causally estimated poses to produce timestamped scene meshes. It separates observation delivery, pose acceptance, and shape integration, with optional image-based gradient refinement of object pose. Across four fixed-input segments from Newer College and Oxford Spires, TEF obtains higher F-scores at 10&nbsp;cm than the tested PIN-SLAM and VDBFusion configurations. A same-code ablation reduces local multilayer intersections from 27.92% to 17.52%, while reducing coverage from 48.29% to 42.09%. A KITTI object-reconstruction case study achieves a 6.50&nbsp;cm median center error with LiDAR-only updates; image refinement has mixed effects. These results support temporal evidence for suppressing accumulated layers and demonstrate an object-local 4D integration path, without establishing general dynamic-reconstruction superiority or end-to-end real-time operation.</p>
+  <p>Temporal Evidence Fusion (TEF) reconstructs surfaces from LiDAR scans with fixed sensor poses. It groups observations into temporal blocks, caps each block's fusion weight, and combines surface-hit and free-space traversal evidence to revise a normalized signed-distance field. Across four fixed-input segments from Newer College and Oxford Spires, TEF obtains higher F-scores at 10&nbsp;cm than the tested PIN-SLAM and VDBFusion configurations. Follow-up controls on a development segment and two Oxford Spires segments support fewer free-space conflicts at matched held-out missing-ray rates in the comparable comparisons with deletion-only and scale-correct constant-target controls. These are frozen-parameter checks on previously used data, not blind tests. The wall multilayer differences do not establish an advantage of temporal-block counting; follow-up ablations identify smoothing strength as a major factor.</p>
+  <p>An exploratory object-centric extension fuses geometry in each object's local frame and places it into the scene using timestamped poses. A single-vehicle KITTI development case study reaches a 6.50&nbsp;cm median center error with LiDAR-only updates; image refinement has mixed effects, and object-shape accuracy was not measured. The demonstrations below show saved reconstructions and object trajectories, rather than an end-to-end real-time benchmark.</p>
 </div>
 
 <!-- ============================ At a glance ============================ -->
@@ -342,6 +344,7 @@
   </figure>
 
   <div class="stage-detail" id="stage-detail" aria-live="polite"></div>
+  <p class="implementation-note"><b>Implementation.</b> Static table results use a sparse 4&nbsp;cm GPU grid with one-second fusion blocks and final mesh extraction after the last block. Distant blocks are frozen in host memory for final extraction. An optional storage implementation keeps complete block state on the GPU, in a CPU cache or on SSD and restores it when needed. It separates storage placement from fusion rules and was not used to produce the reported static table; it is an implementation detail, not an additional algorithmic contribution.</p>
 </div>
 
 <!-- ============================ Result videos ============================ -->
@@ -356,6 +359,7 @@
   <div class="video-stage">
     <video id="result-video" muted loop playsinline controls preload="none"></video>
   </div>
+  <p class="viz-caption"><b>Saved-result playback.</b> These videos are offline renders. Dynamic clips use interpolated poses at 0.5&times; speed; their playback rate is not a measurement of processing latency.</p>
   <div class="sample-selector">
     <div class="sample-buttons" id="video-cats">
       <button class="sample-type-button selected" data-cat="static">Static scenes</button>
@@ -405,12 +409,13 @@
 <!-- ============================ Dynamic ============================ -->
 <div class="visualization-container" id="dynamic-results">
   <div class="viz-head">
-    <h2>Interactive 4D Reconstruction</h2>
+    <h2>Object-centric Extension</h2>
     <div class="info-tooltip-container">
       <button class="info-button" aria-label="Viewer controls">i</button>
       <span class="info-tooltip-text">Pick a sequence below. Drag to orbit, right-drag to pan, scroll to zoom, double-click to reset. The slider scrubs through the timestamps; the chart is clickable.</span>
     </div>
   </div>
+  <p class="viz-caption extension-intro"><b>Exploratory examples.</b> Replay saved object meshes and estimated trajectories at their recorded timestamps. This viewer illustrates the extension; it does not establish object-shape accuracy or end-to-end real-time reconstruction.</p>
   <div class="visualization" id="dyn-viz">
     <canvas class="viz-canvas" id="dyn-canvas"></canvas>
     <img class="video-frame" id="dyn-frame" alt="Camera image at the current timestamp">
@@ -499,8 +504,9 @@
     <img class="zoomable" src="static/img/gallery/four_segments.png" alt="Bar chart of F10 and dot plot of completeness for TEF, pure fusion, PIN-SLAM and VDBFusion on four segments." loading="lazy">
     <figcaption>The same four segments as a chart: F10 (left, higher is better) and completeness (right, lower is better). Point estimates only; the paired intervals are in the paper.</figcaption>
   </figure>
-  <h3>What the temporal evidence changes</h3>
-  <p>Same-code 2&times;2 ablation on the NCD development segment: bounded versus summed block weights, and traversal (pass) evidence on or off. Multilayer rate is measured on 11&nbsp;295 wall cross-sections covered by all four arms; coverage on all 28&nbsp;042; ray categories on 600&nbsp;000 held-out rays. The mechanism suppresses accumulated layers and free-space conflicts at a measurable coverage cost.</p>
+  <h3>Temporal Evidence: Effects and Trade-offs</h3>
+  <p>Same-code 2&times;2 ablation on the NCD development segment: bounded versus summed block weights, and traversal (pass) evidence on or off. All values are percentages. Multilayer rate is measured on 11&nbsp;295 wall cross-sections covered by all four arms; coverage on all 28&nbsp;042; ray categories on 600&nbsp;000 held-out rays. Regularization strength &lambda;&nbsp;=&nbsp;0.3; meshes were extracted every 10&nbsp;s. A final-only extraction check left the coverage and multilayer indicators unchanged.</p>
+  <p><b>Interpretation.</b> The 27.92% to 17.52% multilayer difference is a comparison of complete configurations with different coverage, not an isolated effect of temporal evidence. Follow-up ablations identify smoothing strength &lambda; as the main control of wall multilayers and traversal evidence as the main control of free-space conflicts. A general multilayer advantage was not established across the two Spires segments, nor was an advantage of block counting over per-ray counting.</p>
   <div class="table-wrap">
     <table class="result-table compact">
       <thead>
@@ -514,6 +520,7 @@
       </tbody>
     </table>
   </div>
+  <p>Frozen-parameter checks on the two previously used Spires segments support lower free-space conflict at matched held-out missing-ray rates in all comparable deletion-only and constant-target comparisons. The difference is 1.3&ndash;5.5 percentage points against the comparable deletion-only controls and 0.3&ndash;1.0 against constant-target controls; some comparison cells remain incomparable. These checks are not blind tests. An exploratory carving combination (per-sample fusion, per-ray counting and a constant target) achieved higher F10 on both segments, with more missing rays and worse accuracy, so the results do not establish general superiority over carving.</p>
 </div>
 
 <!-- ============================ Citation ============================ -->
@@ -534,7 +541,7 @@
   </div>
 </div>
 
-<p class="footer-note">Draft project page. Numbers are taken from the current manuscript; the overview video, author list and links will be added before release.</p>
+<p class="footer-note">Draft project page. Table values are retained from the manuscript; their interpretation incorporates follow-up checks. Author information and publication links will be added before release.</p>
 
 <div class="lightbox" id="lightbox" hidden>
   <button class="lightbox-close" aria-label="Close">×</button>
@@ -542,6 +549,6 @@
   <div class="lightbox-caption"></div>
 </div>
 
-<script type="module" src="static/js/main.js?v=20260927e"></script>
+<script type="module" src="static/js/main.js?v=20260929b"></script>
 </body>
 </html>
