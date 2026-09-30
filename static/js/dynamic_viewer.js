@@ -9,15 +9,21 @@ import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
 import { fetchTEFM, SRGB_TO_LINEAR } from './codec.js';
 
 const BASE = 'static/data/dynamic/';
+const REVISION = 'vehicle-guard-c25-r2';
 const FPS = 10;                                    // KITTI LiDAR rate: real-time playback
-const C = { predicted: '#f29900', heldout: '#5f6368', ego: '#80868b' };
+const C = { predicted: '#f29900', constrained: '#7b1fa2', heldout: '#5f6368', ego: '#80868b' };
 const STATUS_TEXT = {
   lidar: 'LiDAR registration accepted',
   lidar_image: 'LiDAR registration + image refinement accepted',
   image_only: 'image refinement only (LiDAR rejected)',
   prediction: 'no accepted update: motion prediction',
   heldout_prediction: 'held-out frame: prediction only',
+  constrained_prediction: 'heading-constrained prediction (no shape fusion)',
+  heldout_constrained: 'held-out frame: heading-constrained prediction (no shape fusion)',
 };
+const isConstrained = r => r.status === 'constrained_prediction' || r.status === 'heldout_constrained';
+const statusText = r => r.guard_outcome === 'restart' ? 'LiDAR re-registration from travel heading accepted' :
+  r.guard_outcome === 'reacquired' ? 'reliable LiDAR registration reacquired' : STATUS_TEXT[r.status] || r.status;
 const hexLin = h => new THREE.Color(h).toArray();
 
 function circleTexture() {
@@ -76,7 +82,7 @@ export class DynamicViewer {
   }
 
   async init() {
-    this.list = (await (await fetch(BASE + 'index.json')).json()).sequences;
+    this.list = (await (await fetch(BASE + 'index.json?v=' + REVISION)).json()).sequences;
     this.samples.innerHTML = '';
     this.list.forEach((s, i) => {
       const img = document.createElement('img');
@@ -116,7 +122,7 @@ export class DynamicViewer {
   async load(id) {
     if (this.cache[id]) return this.cache[id];
     const dir = BASE + id + '/';
-    const meta = await (await fetch(dir + 'meta.json')).json();
+    const meta = await (await fetch(dir + 'meta.json?v=' + REVISION)).json();
     const files = [meta.background.file, ...meta.objects.flatMap(o => o.revisions.map(r => r.file))];
     let done = 0;
     const data = await Promise.all(files.map(f => fetchTEFM(dir + f).then(d => {
@@ -162,7 +168,7 @@ export class DynamicViewer {
       const dp = new Float32Array(o.rows.length * 3), dc = new Float32Array(o.rows.length * 3);
       o.rows.forEach((r, j) => {
         dp.set([r.pose[0][3], r.pose[1][3], r.pose[2][3] + 0.05], 3 * j);
-        dc.set(hexLin(r.heldout ? C.heldout : r.accepted ? o.colour : C.predicted), 3 * j);
+        dc.set(hexLin(isConstrained(r) ? C.constrained : r.heldout ? C.heldout : r.accepted ? o.colour : C.predicted), 3 * j);
       });
       const dg = new THREE.BufferGeometry();
       dg.setAttribute('position', new THREE.BufferAttribute(dp, 3)); dg.setAttribute('color', new THREE.BufferAttribute(dc, 3));
@@ -216,6 +222,7 @@ export class DynamicViewer {
     let faces = 0; for (const s of M.background.reveal) if (s.frame <= f) faces = s.faces;
     this.bg.geometry.setDrawRange(0, faces * 3);
     let inView = 0, nLidar = 0, nImage = 0, nPred = 0, single = null;
+    const guardDetails = [];
     for (const s of this.objs) {
       const rows = s.o.rows, first = rows[0].frame, last = rows[rows.length - 1].frame;
       let upto = -1;
@@ -228,6 +235,10 @@ export class DynamicViewer {
         s.mesh.visible = true; s.mesh.geometry = s.geoms[r.revision];
         s.mesh.matrix.set(...r.pose.flat()); s.mesh.matrixWorldNeedsUpdate = true;
         inView++; if (r.status === 'lidar' || r.status === 'lidar_image') nLidar++; if (r.image) nImage++; if (!r.accepted) nPred++;
+        if (isConstrained(r) || r.guard_events?.length) {
+          guardDetails.push(`<br><span class="${r.accepted ? 'ok' : 'warn'}">ID ${s.o.id}: ${statusText(r)}</span>` +
+            `<br>shape fused: ${r.fused ? 'yes' : 'no'}`);
+        }
         single = { s, r };
       } else s.mesh.visible = false;
     }
@@ -238,12 +249,12 @@ export class DynamicViewer {
     if (M.objects.length === 1 && single) {
       const r = single.r, err = M.audit ? M.audit.center_cm[r.frame] : null;
       const cls = r.heldout ? 'no' : r.accepted ? 'ok' : 'warn';
-      this.status.innerHTML = `<b>${M.title}</b><br><span class="${cls}">${STATUS_TEXT[r.status] || r.status}</span>` +
+      this.status.innerHTML = `<b>${M.title}</b><br><span class="${cls}">${statusText(r)}</span>` +
         `<span class="more"><br>shape fused: ${r.fused ? '<span class="ok">yes</span>' : '<span class="no">no</span>'} · mesh from frame ${single.s.o.revisions[r.revision].available_frame}</span>` +
         (err != null ? `<br>center error ${err.toFixed(1)} cm` : '');
     } else {
       this.status.innerHTML = `<b>${M.title}</b><br>${inView} tracked object${inView === 1 ? '' : 's'} at this frame` +
-        `<span class="more"><br><span class="ok">${nLidar} LiDAR accepted</span> · ${nImage} with image refinement · <span class="warn">${nPred} predicted</span></span>`;
+        `<span class="more"><br><span class="ok">${nLidar} LiDAR accepted</span> · ${nImage} with image refinement · <span class="warn">${nPred} predicted</span>${guardDetails.join('')}</span>`;
     }
     if (this.follow.checked) {
       const target = this.smoothEgo[i].clone().addScaledVector(this.heading[i], 10);
@@ -317,12 +328,13 @@ export class DynamicViewer {
         s += `<line x1="${x0}" x2="${x1}" y1="${y + 6}" y2="${y + 6}" stroke="#f1f3f4"/>`;
         o.rows.forEach(r => {
           const i = M.frames.indexOf(r.frame); if (i < 0) return;
-          const fill = r.heldout ? '#dadce0' : !r.accepted ? C.predicted : o.colour;
+          const fill = isConstrained(r) ? C.constrained : r.heldout ? '#dadce0' : !r.accepted ? C.predicted : o.colour;
           const op = r.image || r.heldout || !r.accepted ? 1 : 0.5;
-          s += `<rect x="${(X(i) - dx / 2).toFixed(1)}" y="${y + 1}" width="${Math.max(dx - 0.6, 1).toFixed(1)}" height="${rowH - 3}" fill="${fill}" opacity="${op}"/>`;
+          const outline = r.guard_events?.length ? ' stroke="#202124" stroke-width="1"' : '';
+          s += `<rect x="${(X(i) - dx / 2).toFixed(1)}" y="${y + 1}" width="${Math.max(dx - 0.6, 1).toFixed(1)}" height="${rowH - 3}" fill="${fill}" opacity="${op}"${outline}><title>ID ${o.id}, frame ${r.frame}: ${statusText(r)}; shape fused: ${r.fused ? 'yes' : 'no'}</title></rect>`;
         });
       });
-      this.chartTitle.innerHTML = 'Update per object and frame <span>— solid: LiDAR + image accepted, light: LiDAR accepted, orange: prediction, grey: held-out</span>';
+      this.chartTitle.innerHTML = 'Update per object and frame <span>— solid: LiDAR + image, light: LiDAR, orange: prediction, purple: heading-constrained prediction, grey: held-out; outline: guard event</span>';
       this.cursorY = [2, top + rowH * M.objects.length];
     }
     for (let i = 0; i < n; i += 20) s += `<text x="${X(i)}" y="${H - 8}" text-anchor="middle" font-size="11" fill="#80868b">${M.frames[i]}</text>`;
