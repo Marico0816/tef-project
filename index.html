@@ -72,7 +72,7 @@
   <h2>At a Glance</h2>
   <figure class="fig-container zoomable-figure">
     <img class="zoomable" src="static/img/gallery/teaser_split_colour.jpg" alt="Left: TEF surface of Keble College coloured from the TLS survey, with a close-up of the chapel. Right: KITTI 0005 TEF static map with camera colours, a tracked van and cyclist, and the S-bend from one viewpoint in pure fusion and in TEF." loading="lazy">
-    <figcaption><b>Left:</b> Oxford Spires, Keble College — the TEF surface map from 540 scans (12&nbsp;000 returns each); colours are taken from the TLS reference survey for display and do not enter the reconstruction. Below, the chapel in the dashed box. <b>Right:</b> KITTI 0005 — the TEF static map with forward-camera colours for display; the van and the cyclist come from the exploratory object layer (tracker output, not compared with annotations on this sequence). Below, the dashed S-bend from one viewpoint in the pure-fusion configuration of the same implementation and in TEF; surface within 0.3&nbsp;m of input returns from moving road users is coloured by their scan time. Pure fusion keeps surface at these positions; the controlled measurement of residual ghosts is in the paper (Sec. 6.4).</figcaption>
+    <figcaption><b>Left:</b> Oxford Spires, Keble College — the TEF surface map from 540 scans (12&nbsp;000 returns each); colours are taken from the TLS reference survey for display and do not enter the reconstruction. Below, the chapel in the dashed box. <b>Right:</b> KITTI 0005 — the TEF static map with forward-camera colours for display; the van and the cyclist come from the exploratory object layer (original illustration, heading guard off; the updated replay is below). Below, the dashed S-bend from one viewpoint in the pure-fusion configuration of the same implementation and in TEF; surface within 0.3&nbsp;m of input returns from moving road users is coloured by their scan time. Pure fusion keeps surface at these positions; the controlled measurement of residual ghosts is in the paper (Sec. 6.4).</figcaption>
   </figure>
 </div>
 
@@ -423,6 +423,7 @@
     <div class="dyn-legend">
       <span><i style="background:linear-gradient(90deg,#1f77b4,#d62728,#2ca02c)"></i>trajectory, one colour per object</span>
       <span><i class="dot" style="background:#f29900"></i>prediction (no accepted update)</span>
+      <span><i class="dot" style="background:#7b1fa2"></i>heading-constrained prediction (no fusion)</span>
       <span><i class="dot" style="background:#5f6368"></i>held-out frame</span>
       <span><i style="background:#80868b"></i>sensor vehicle (dot = now)</span>
     </div>
@@ -445,7 +446,9 @@
     <div class="chart-title" id="dyn-chart-title"></div>
     <svg id="dyn-chart" class="dyn-chart" role="img" aria-label="Per-frame chart for the selected sequence"></svg>
   </div>
-  <p class="viz-caption">All three sequences use the dynamic extension in LiDAR + image mode, with cached point ownership and fixed sensor poses. KITTI 0059 (target 51, frames 180–279) is the paper's case study; its pose errors come from a separate post-run audit. KITTI 0005 and 0014 are display runs of the same code on saved object tracks: they are not part of the paper's evaluation and were not compared with annotations. The image step needs enough tracked features on the vehicle mask; it was accepted on 82 of 89 attempts for the 0059 car and 38 of 48 for the 0005 van, while for the cyclist and most oncoming cars it found too few features and the pose came from LiDAR registration alone. Each object mesh is revised every 5 frames and shown from the frame it becomes available. The background is the TEF static map with camera colours for display, revealed as its causal snapshots first contain nearby geometry.</p>
+  <p class="viz-caption">All three sequences use LiDAR + image tracking, cached point ownership and fixed sensor poses. This replay enables the optional <b>25° vehicle heading guard</b>: it checks orientation against travel direction estimated from reliable past positions, retries registration when needed, and suspends shape fusion while the pose is a constrained prediction. The guard applies to vehicles travelling at least 2&nbsp;m/s; it does not apply to the cyclist. Poses and mesh revisions come from the same saved runs, with no browser-side orientation correction.</p>
+  <p class="viz-caption">In KITTI 0005, the guard prevents the van's observed flip; maximum absolute yaw error is <b>18.2° versus 177.2° without the guard</b>, measured after tracking using annotations. This diagnostic uses an existing failure case and is not evidence of general tracking accuracy. KITTI 0014 has one additional constrained frame (target 551, frame 69), with no ground truth at that frame to confirm the correction. KITTI 0059 (target 51, frames 180–279) remains identical to the paper's case study; its displayed pose errors come from the original separate post-run audit. Paper tables are unchanged.</p>
+  <p class="viz-caption">The image step needs enough tracked features on the vehicle mask; it was accepted on 82 of 89 attempts for the 0059 car and 39 of 51 for the guarded 0005 van. The cyclist and most oncoming cars rely mainly on LiDAR registration. Each object mesh is revised every 5 frames and shown from the frame it becomes available. The background is the TEF static map with camera colours for display, revealed as its causal snapshots first contain nearby geometry.</p>
 </div>
 
 <!-- ============================ Gallery ============================ -->
@@ -466,7 +469,7 @@
     </figure>
     <figure class="gallery-item wide">
       <img class="zoomable" src="static/img/gallery/turn_multi.jpg" alt="KITTI 0005: a van and a cyclist tracked through an S-curve, with camera input, heading and position plots." loading="lazy">
-      <figcaption><b>Two road users through an S-curve (KITTI 0005).</b> Van and cyclist tracked and fused alongside the sensor by the exploratory object layer: tracker output, no annotation used. The display map uses all returns per frame (evaluated maps use 12&nbsp;000).</figcaption>
+      <figcaption><b>Two road users through an S-curve (KITTI 0005).</b> Original illustration with the heading guard off; the interactive replay above uses the corrected, guarded run. Tracking uses no annotations. The display map uses all returns per frame (evaluated maps use 12&nbsp;000).</figcaption>
     </figure>
   </div>
 </div>
@@ -549,6 +552,6 @@
   <div class="lightbox-caption"></div>
 </div>
 
-<script type="module" src="static/js/main.js?v=20260929b"></script>
+<script type="module" src="static/js/main.js?v=vehicle-guard-c25-r2"></script>
 </body>
 </html>
