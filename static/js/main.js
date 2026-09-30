@@ -1,7 +1,7 @@
 import { initMethod } from './method.js?v=20260929b';
 import { StaticComparison } from './static_viewer.js';
-import { DynamicViewer } from './dynamic_viewer.js';
-import { VideoGallery } from './videos.js?v=20260929b';
+import { DynamicViewer } from './dynamic_viewer.js?v=vehicle-guard-c25-r2';
+import { VideoGallery } from './videos.js?v=vehicle-guard-c25-r2';
 import { initLightbox } from './gallery.js';
 
 // Chapter buttons navigate the page independently of video playback.
